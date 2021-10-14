@@ -1,3 +1,4 @@
+from activation_function import threshold_bipolar
 from perceptron import *
 
 

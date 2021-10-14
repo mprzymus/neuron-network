@@ -1,6 +1,7 @@
 import numpy as np
 
-from perceptron import Perceptron, threshold_bipolar
+from perceptron import Perceptron
+from activation_function import threshold_bipolar
 
 
 def extend_data(x_train, y_train, factor):
