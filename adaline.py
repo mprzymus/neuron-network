@@ -21,9 +21,9 @@ class Adaline:
         return self.act_function(total)
 
     def sum_input(self, x):
-        return np.dot(x, self.weights) + self.bias
+        return (x * self.weights).sum() + self.bias
 
-    def fit(self, x_train, y_train, stop_error=0.2406):
+    def fit(self, x_train, y_train, stop_error=0.15):
         set_size = np.size(x_train)
         error_avg = stop_error + 1
         i = 0
@@ -31,11 +31,12 @@ class Adaline:
             print(f"epoch {i}")
             print(f"{self.weights}, {self.bias}")
             i += 1
-            total_input = self.sum_input(x_train)
-            errors = (y_train - total_input)
-            step = x_train.T.dot(errors)
-            self.weights += self.alfa * step
-            self.bias = self.alfa * errors.sum()
-            errors_squered = (errors ** 2)
-            error_avg = errors_squered.sum() / set_size
+            error_avg = 0
+            for count, x in enumerate(x_train):
+                net_input = self.sum_input(x)
+                errors = y_train[count] - net_input
+                self.weights += self.alfa * errors * x
+                self.bias += self.alfa * errors
+                errors_squared = errors ** 2
+                error_avg += errors_squared / set_size
             print(f"error: {error_avg}")

@@ -26,3 +26,6 @@ if __name__ == '__main__':
     perceptron = Perceptron(act_function=threshold_bipolar)
     x_train_extended, y_train_extended = extend_data(x_train_bipolar, y_train_bipolar, 5)
     perceptron.fit(x_train_extended, y_train_extended)
+    predict = perceptron.predict([0.99, 1.01])
+    print('wynik: ' + str(predict))
+
