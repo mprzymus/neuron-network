@@ -4,7 +4,8 @@ from activation_function import threshold_unipolar
 
 
 class Perceptron:
-    def __init__(self, weights=None, act_function=threshold_unipolar, alfa=0.01, size=2, bias=None, bias_static=False):
+    def __init__(self, weights=None, act_function=threshold_unipolar, alfa=0.01, size=2, bias=None, bias_static=False,
+                 max_weight=1):
         self.weights = weights
         self.bias_static = bias_static
         self.epochs = 0
@@ -16,7 +17,7 @@ class Perceptron:
             self.bias = bias
         self.size = size
         if self.weights is None:
-            self.weights = np.random.rand(size) * 2 - 1
+            self.weights = (np.random.rand(size) * 2 - 1) * max_weight
             self.weights[1] *= 1
 
     def predict(self, x):
