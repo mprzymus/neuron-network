@@ -1,22 +1,7 @@
 import numpy as np
 
-from activation_function import threshold_bipolar, threshold_unipolar
 from adaline import Adaline
-
-
-def extend_data(x_train, y_train, factor):
-    array_x = []
-    array_y = []
-    for count, x in enumerate(x_train):
-        array_x.append(x)
-        array_y.append(y_train[count])
-        for i in range(factor):
-            new_data = x + (np.random.rand(np.size(x)) * 0.01)
-            array_x.append(new_data)
-            array_y.append(y_train[count])
-    return np.array(array_x), np.array(array_y)
-
-
+from extension_data import extend_data
 
 x_train_bipolar = np.array([[1, 1], [1, -1], [-1, 1], [-1, -1]])
 y_train_bipolar = np.array([1, -1, -1, -1])
