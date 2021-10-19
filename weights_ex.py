@@ -1,23 +1,26 @@
-import statistics
-
 import numpy as np
 
-from extension_data import extend_data, x_train_unipolar_aug, y_train_unipolar_aug
+from adaline import Adaline
+from extension_data import y_train_bipolar_aug, x_train_bipolar_aug
 from output_utils import show_history
-from perceptron import Perceptron
 
 
 def weights_perceptron(max_weight):
-    return Perceptron(bias_static=False, bias=0, max_weight=max_weight)
+    return Adaline(max_weight=max_weight)
 
 
 def conduct(neural_factory):
     for weight in np.linspace(-1, 1, 11):
         history = []
         for i in range(10):
-            perceptron = neural_factory(weight)
-            perceptron.fit(x_train_unipolar_aug, y_train_unipolar_aug, verbose=False)
-            history.append(perceptron.epochs)
+            model = neural_factory(weight)
+            model.fit(x_train_bipolar_aug, y_train_bipolar_aug, stop_error=0.11)
+            history.append(model.epochs)
+            errors = 0
+            for count, x in enumerate(x_train_bipolar_aug):
+                if model.predict(x) != y_train_bipolar_aug[count]:
+                    errors += 1
+            print(errors)
         show_history(history, weight)
 
 
