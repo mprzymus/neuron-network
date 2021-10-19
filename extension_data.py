@@ -20,4 +20,4 @@ x_train_unipolar_aug, y_train_unipolar_aug = extend_data(x_train_unipolar, y_tra
 
 x_train_bipolar = np.array([[1, 1], [1.1, 1], [1, 1.1], [1, -1], [-1, 1], [-1, -1]])
 y_train_bipolar = np.array([1, 1, 1, -1, -1, -1])
-x_train_bipolar_aug, y_train_bipolar_aug = extend_data(x_train_bipolar, y_train_bipolar, 100)
+x_train_bipolar_aug, y_train_bipolar_aug = extend_data(x_train_bipolar, y_train_bipolar, 10)
