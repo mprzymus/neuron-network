@@ -1,14 +1,12 @@
-import statistics
-
 import numpy as np
 
-from extension_data import extend_data, x_train_unipolar_aug, y_train_unipolar_aug
+from extension_data import x_train_unipolar_aug, y_train_unipolar_aug
 from output_utils import show_history
 from perceptron import Perceptron
 
 
-def weights_perceptron(max_weight):
-    return Perceptron(bias_static=False, bias=0, max_weight=max_weight)
+def weights_perceptron(alfa):
+    return Perceptron(bias_static=False, alfa=alfa)
 
 
 def conduct(neural_factory):
