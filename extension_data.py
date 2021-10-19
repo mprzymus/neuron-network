@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def extend_data(x_train, y_train, augmented_size_factor, element_diff_factor=0.1):
+def extend_data(x_train, y_train, augmented_size_factor, element_diff_factor=0.4):
     array_x = []
     array_y = []
     for count, x in enumerate(x_train):
@@ -16,4 +16,8 @@ def extend_data(x_train, y_train, augmented_size_factor, element_diff_factor=0.1
 
 x_train_unipolar = np.array([[1, 1], [1.1, 1], [1, 1.1], [1, 0], [0, 1], [0, 0]])
 y_train_unipolar = np.array([1, 1, 1, 0, 0, 0])
-x_train_unipolar_aug, y_train_unipolar_aug = extend_data(x_train_unipolar, y_train_unipolar, 10)
+x_train_unipolar_aug, y_train_unipolar_aug = extend_data(x_train_unipolar, y_train_unipolar, 100)
+
+x_train_bipolar = np.array([[1, 1], [1.1, 1], [1, 1.1], [1, -1], [-1, 1], [-1, -1]])
+y_train_bipolar = np.array([1, 1, 1, -1, -1, -1])
+x_train_bipolar_aug, y_train_bipolar_aug = extend_data(x_train_bipolar, y_train_bipolar, 100)

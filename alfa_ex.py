@@ -6,17 +6,17 @@ from perceptron import Perceptron
 
 
 def weights_perceptron(alfa):
-    return Perceptron(bias_static=False, alfa=alfa)
+    return Perceptron(alfa=alfa)
 
 
 def conduct(neural_factory):
-    for weight in np.linspace(-1, 1, 11):
+    for alfa in np.linspace(10, 100, 3):
         history = []
         for i in range(10):
-            perceptron = neural_factory(weight)
+            perceptron = neural_factory(alfa)
             perceptron.fit(x_train_unipolar_aug, y_train_unipolar_aug, verbose=False)
             history.append(perceptron.epochs)
-        show_history(history, weight)
+        show_history(history, round(alfa*1000)/1000)
 
 
 if __name__ == '__main__':
