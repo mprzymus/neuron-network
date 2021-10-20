@@ -12,7 +12,6 @@ def weights_adaline(alfa):
 def conduct(neural_factory):
     for alfa in np.linspace(0.0945, 0.6, 20):
         history = []
-        errors = 0
         for i in range(10):
             model = neural_factory(alfa)
             model.fit(x_train_bipolar_aug, y_train_bipolar_aug, stop_error=0.001, verbose=False)

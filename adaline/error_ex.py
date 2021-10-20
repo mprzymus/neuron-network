@@ -30,7 +30,7 @@ def conduct(neural_factory):
                     true_negative += 1
 
         show_stats([true_positive / 10, true_negative / 10, false_negative / 10, false_positive / 10],
-                     round(error * 1000) / 1000)
+                   round(error * 1000) / 1000)
 
 
 if __name__ == '__main__':
