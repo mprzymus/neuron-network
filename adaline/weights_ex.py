@@ -2,7 +2,7 @@ import numpy as np
 
 from adaline import Adaline
 from adaline.extension_data import y_train_bipolar_aug, x_train_bipolar_aug
-from output_utils import show_history
+from adaline.output_utils import show_history
 
 
 def weights_perceptron(max_weight):

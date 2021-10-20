@@ -2,7 +2,7 @@ import numpy as np
 
 from adaline import Adaline
 from extension_data import x_train_bipolar_aug, y_train_bipolar_aug, x_test_bipolar_aug, y_test_bipolar_aug
-from output_utils import show_history, show_stats
+from adaline.output_utils import show_stats
 
 
 def weights_adaline(alfa):
