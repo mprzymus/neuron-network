@@ -1,7 +1,6 @@
 from activation_function import threshold_bipolar, threshold_unipolar
-from extension_data import x_train_unipolar_aug, y_train_unipolar_aug, y_train_unipolar, x_train_unipolar, \
-    x_train_bipolar_aug, y_train_bipolar_aug
-from output_utils import show_history
+from l1.extension_data import x_train_unipolar_aug, y_train_unipolar_aug, x_train_bipolar_aug, y_train_bipolar_aug
+from l1.output_utils import show_history
 from perceptron import Perceptron
 
 

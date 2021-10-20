@@ -1,9 +1,7 @@
-import statistics
-
 import numpy as np
 
-from extension_data import extend_data, x_train_unipolar_aug, y_train_unipolar_aug
-from output_utils import show_history
+from l1.extension_data import x_train_unipolar_aug, y_train_unipolar_aug
+from l1.output_utils import show_history
 from perceptron import Perceptron
 
 

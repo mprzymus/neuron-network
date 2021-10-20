@@ -1,7 +1,7 @@
 import numpy as np
 
 from adaline import Adaline
-from extension_data import extend_data
+from l1.extension_data import extend_data
 
 x_train_bipolar = np.array([[1, 1], [1, -1], [-1, 1], [-1, -1]])
 y_train_bipolar = np.array([1, -1, -1, -1])

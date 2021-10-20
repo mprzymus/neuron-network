@@ -1,6 +1,6 @@
 import numpy as np
 
-from extension_data import extend_data
+from l1.extension_data import extend_data
 from perceptron import Perceptron
 from activation_function import threshold_bipolar
 
