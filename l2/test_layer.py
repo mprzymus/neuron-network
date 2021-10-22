@@ -10,14 +10,15 @@ LAYER_SIZE = 6
 INPUT_SIZE = 4
 
 
-class OnesInitStrategy:
-    def init_weights(self, input_size, layer_size):
+class SequentialInitStrategy:
+    @staticmethod
+    def init_weights(input_size, layer_size):
         return np.arange(input_size*layer_size).reshape((layer_size, input_size))
 
 
 class TestLayer(unittest.TestCase):
     def setUp(self) -> None:
-        self.layer = Layer(INPUT_SIZE, LAYER_SIZE, weights_init_strategy=OnesInitStrategy())
+        self.layer = Layer(INPUT_SIZE, LAYER_SIZE, weights_init_strategy=SequentialInitStrategy())
 
     def test_activate(self):
         input_vector = np.array([1, 2, 3, 4])
