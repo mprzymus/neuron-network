@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from numpy.testing import assert_array_equal
 
-from l2.layer import Layer
+from l2.layers import Layer
 
 LAYER_SIZE = 6
 

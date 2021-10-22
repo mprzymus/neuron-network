@@ -9,7 +9,7 @@ class GaussianWeightsInit:
         self.scale = standard_dev
 
     def init_weights(self, input_size, layer_size):
-        return np.random.normal(size=(input_size, layer_size), loc=self.loc, scale=self.scale)
+        return np.random.normal(size=(layer_size, input_size), loc=self.loc, scale=self.scale)
 
 
 class Layer:
