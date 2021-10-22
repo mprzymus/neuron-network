@@ -16,6 +16,7 @@ class Layer:
     def __init__(self, input_size, layer_size, act_function=relu, weights_init_strategy=GaussianWeightsInit()):
         self.weights = weights_init_strategy.init_weights(input_size, layer_size)
         self.act_function = act_function
+        self.bias = weights_init_strategy.init_weights(1, layer_size).reshape(layer_size)
 
     def output_size(self):
         layer_size, input_size = self.weights.shape
@@ -23,6 +24,7 @@ class Layer:
 
     def activate(self, input_vector):
         weighted = self.weights.dot(input_vector)
+        weighted += self.bias
         return np.vectorize(self.act_function)(weighted)
 
 

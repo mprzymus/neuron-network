@@ -25,4 +25,4 @@ class TestLayer(unittest.TestCase):
         result = self.layer.activate(input_vector)
 
         assert result.shape == (LAYER_SIZE,)
-        assert_array_equal(result, np.array([20, 60, 100, 140, 180, 220]))
+        assert_array_equal(result, np.array([20, 61, 102, 143, 184, 225]))
