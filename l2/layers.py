@@ -26,7 +26,7 @@ class Layer:
             self.bias = bias
 
     def output_size(self):
-        layer_size, input_size = self.weights.shape
+        layer_size, _ = self.weights.shape
         return layer_size
 
     def activate(self, input_vector):
