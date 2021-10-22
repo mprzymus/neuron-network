@@ -1,15 +1,41 @@
+import time
+
 import numpy as np
 
-from l2.layers import Layer, Softmax
+from l2.activation_function import relu
+from l2.layers import Layer, Softmax, GaussianWeightsInit
+
+
+class Network:
+    def __init__(self, first_layer):
+        self.layers = [first_layer]
+
+    def add_layer(self, layer_size, act_function=relu, weights_init_strategy=GaussianWeightsInit()):
+        last_layer_out = self.output_size()
+        layer = Layer(last_layer_out, layer_size, act_function=act_function,
+                      weights_init_strategy=weights_init_strategy)
+        self.layers.append(layer)
+
+    def output_size(self):
+        return self.layers[-1].output_size()
+
+    def setup(self):
+        self.layers.append(Softmax())
+
+    def predict(self, xs):
+        for layer in self.layers:
+            xs = layer.activate(xs)
+        return xs
+
 
 if __name__ == '__main__':
     l1 = Layer(4, 6)
-    l2 = Layer(6, 2)
-    l3 = Softmax()
+    model = Network(l1)
+    model.add_layer(8)
+    model.add_layer(3)
+    model.setup()
 
     x = np.arange(4)
 
-    l1x = l1.activate(x)
-    l2x = l2.activate(l1x)
-    y = l3.activate(l2x)
+    y = model.predict(x)
     print(y)

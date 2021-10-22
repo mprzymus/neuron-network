@@ -17,6 +17,10 @@ class Layer:
         self.weights = weights_init_strategy.init_weights(input_size, layer_size)
         self.act_function = act_function
 
+    def output_size(self):
+        layer_size, input_size = self.weights.shape
+        return layer_size
+
     def activate(self, input_vector):
         weighted = self.weights.dot(input_vector)
         return np.vectorize(self.act_function)(weighted)
