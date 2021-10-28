@@ -21,7 +21,7 @@ class Layer:
         self.weights = weights_init_strategy.init_weights(input_size, layer_size)
         self.act_function = act_function
         if bias is None:
-            self.bias = weights_init_strategy.init_weights(1, layer_size).reshape(layer_size)
+            self.bias = weights_init_strategy.init_weights(1, 1)[0]
         else:
             self.bias = bias
 
