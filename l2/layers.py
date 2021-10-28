@@ -24,6 +24,7 @@ class Layer:
             self.bias = weights_init_strategy.init_weights(1, 1)[0]
         else:
             self.bias = bias
+        self.last_result = None
 
     def output_size(self):
         layer_size, _ = self.weights.shape
@@ -32,7 +33,8 @@ class Layer:
     def activate(self, input_vector):
         weighted = self.weights.dot(input_vector)
         weighted += self.bias
-        return np.vectorize(self.act_function)(weighted)
+        self.last_result = np.vectorize(self.act_function)(weighted)
+        return self.last_result
 
 
 class Softmax:
