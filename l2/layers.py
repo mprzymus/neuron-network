@@ -1,6 +1,6 @@
 import numpy as np
 
-from l2.activation_function import relu
+from l2.activation_function import Relu
 
 
 class GaussianWeightsInitStrategy:
@@ -16,7 +16,7 @@ _gaussian = GaussianWeightsInitStrategy()
 
 
 class Layer:
-    def __init__(self, input_size, layer_size, act_function=relu, weights_init_strategy=_gaussian,
+    def __init__(self, input_size, layer_size, act_function=Relu, weights_init_strategy=_gaussian,
                  bias=None):
         self.weights = weights_init_strategy.init_weights(input_size, layer_size)
         self.act_function = act_function
@@ -31,16 +31,28 @@ class Layer:
         return layer_size
 
     def activate(self, input_vector):
+        self.calculate_act_input(input_vector)
+        return np.vectorize(self.act_function.apply)(self.last_result)
+
+    def calculate_act_input(self, input_vector):
         weighted = self.weights.dot(input_vector)
-        weighted += self.bias
-        self.last_result = np.vectorize(self.act_function)(weighted)
-        return self.last_result
+        self.last_result = self.bias + weighted
+
+    def loss_derivative(self):
+        return np.vectorize(self.act_function.apply_derivative)(self.last_result)
 
 
-class Softmax:
+class Softmax(Layer):
+    def __init__(self, input_size, layer_size, weights_init_strategy=_gaussian, bias=None):
+        super().__init__(input_size, layer_size, weights_init_strategy=weights_init_strategy, bias=bias)
+        self.act_function = self.SoftmaxFun
+
     def activate(self, input_vector):
-        result = np.exp(input_vector) / np.sum(np.exp(input_vector))
-        return result
+        self.calculate_act_input(input_vector)
+        return self.act_function.apply(self.last_result)
 
-    def output_size(self):
-        pass
+    class SoftmaxFun:
+        @staticmethod
+        def apply(input_vector):
+            result = np.exp(input_vector) / np.sum(np.exp(input_vector))
+            return result

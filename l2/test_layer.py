@@ -15,7 +15,7 @@ INPUT_SIZE = 4
 class SequentialInitStrategy:
     @staticmethod
     def init_weights(input_size, layer_size):
-        return np.arange(input_size*layer_size).reshape((layer_size, input_size))
+        return np.arange(input_size * layer_size).reshape((layer_size, input_size))
 
 
 class TestLayer(unittest.TestCase):
@@ -29,4 +29,5 @@ class TestLayer(unittest.TestCase):
 
         assert result.shape == (LAYER_SIZE,)
         assert_array_equal(result, np.array([20 + BIAS, 60 + BIAS, 100 + BIAS, 140 + BIAS, 180 + BIAS, 220 + BIAS]))
-        assert_array_equal(self.layer.last_result, np.array([20 + BIAS, 60 + BIAS, 100 + BIAS, 140 + BIAS, 180 + BIAS, 220 + BIAS]))
+        assert_array_equal(self.layer.last_result,
+                           np.array([20 + BIAS, 60 + BIAS, 100 + BIAS, 140 + BIAS, 180 + BIAS, 220 + BIAS]))
