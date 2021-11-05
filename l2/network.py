@@ -54,9 +54,13 @@ class Network:
         valid_error = self.count_loss_on_data(x_valid, y_valid)
         epochs_counter = 0
         while valid_error > wanted_error and epochs_counter < EPOCHS:
+            start_batch_from = 0
             epochs_counter += 1
             epoch_error = 0
-            epoch_error = self.perform_batch(epoch_error, xs, ys)
+            while start_batch_from < epoch_size:
+                epoch_error += self.perform_batch(epoch_error, xs[start_batch_from:start_batch_from + batch_size],
+                                                  ys[start_batch_from:start_batch_from + batch_size])
+                start_batch_from += batch_size
             valid_error = self.count_loss_on_data(x_valid, y_valid)
             print_if_verbose(verbose, f"learn_loss: {epoch_error / epoch_size}, valid_loss {valid_error}")
 
@@ -111,11 +115,8 @@ class Network:
 
     def count_valid_error(self, predictions, y_valid):
         error = 0
-        e = 0
         valid_size = len(y_valid)
         for y_predict, y_actual in zip(predictions, y_valid):
-            if round(y_predict[0]) != y_actual[0]:
-                e += 1
             error += np.sum(self.loss_function(y_actual, y_predict)) / valid_size
         return error
 
