@@ -29,8 +29,8 @@ class Sigmoid:
 class Tanh:
     @staticmethod
     def apply(x):
-        return 2 / (1 + math.exp(-2 * x)) + 1
+        return 2 / (1 + math.exp(-2 * x)) - 1
 
     @staticmethod
     def apply_derivative(tanh_result):
-        return 1 - tanh_result
+        return 1 - tanh_result**2

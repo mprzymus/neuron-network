@@ -4,7 +4,7 @@ from l2.activation_function import *
 from l2.extension_data import x_train_unipolar_aug, y_train_unipolar_aug
 from l2.layers import Layer, Softmax, GaussianWeightsInitStrategy
 
-EPOCHS = 10
+EPOCHS = 20
 
 
 def print_if_verbose(verbose, to_print):
@@ -61,7 +61,7 @@ class Network:
                 softmax_loss += np.outer(self.softmax.last_input, total_loss).T
                 epoch_error += total_loss.sum()
                 for count, layer in enumerate(self.layers[::-1]):
-                    derivative = layer.loss_derivative()
+                    derivative = layer.act_derivative()
                     this_layer_loss = next_layer.weights.T.dot(next_layer_loss) * derivative
                     loss_bias[count] += this_layer_loss
                     loss[count] += np.outer(layer.last_input, this_layer_loss).T

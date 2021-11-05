@@ -28,6 +28,7 @@ class Layer:
             self.bias = bias
         self.last_result = None
         self.last_input = None
+        self.last_act = None
 
     def output_size(self):
         layer_size, _ = self.weights.shape
@@ -38,15 +39,16 @@ class Layer:
         return self.apply_activation()
 
     def apply_activation(self):
-        return np.vectorize(self.act_function.apply)(self.last_result)
+        self.last_act = np.vectorize(self.act_function.apply)(self.last_result)
+        return self.last_act
 
     def calculate_act_input(self, input_vector):
         self.last_input = input_vector
         weighted = self.weights.dot(input_vector)
         self.last_result = self.bias + weighted
 
-    def loss_derivative(self):
-        return np.vectorize(self.act_function.apply_derivative)(self.last_result)
+    def act_derivative(self):
+        return np.vectorize(self.act_function.apply_derivative)(self.last_act)
 
 
 class Softmax(Layer):
