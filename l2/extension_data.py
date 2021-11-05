@@ -18,10 +18,8 @@ x_train_unipolar = np.array([[1, 1], [1.1, 1], [1, 1.1], [1, 0], [0, 1], [0, 0]]
 y_train_unipolar = np.array([[1, 0], [1, 0], [1, 0], [0, 1], [0, 1], [0, 1]])
 x_train_unipolar_aug, y_train_unipolar_aug = extend_data(x_train_unipolar, y_train_unipolar, 100)
 
-x_train_bipolar = np.array([[1, 1], [1.1, 1], [1, 1.1], [1, -1], [-1, 1], [-1, -1]])
-y_train_bipolar = np.array([1, 1, 1, -1, -1, -1])
-x_train_bipolar_aug, y_train_bipolar_aug = extend_data(x_train_bipolar, y_train_bipolar, 10)
+indices = np.arange(x_train_unipolar_aug.shape[0])
+np.random.shuffle(indices)
 
-x_test_bipolar = np.array([[1, 1], [1.01, 1], [1, 1.01], [1, -1], [-1, 1], [-1, -1]])
-y_test_bipolar = np.array([1, 1, 1, -1, -1, -1])
-x_test_bipolar_aug, y_test_bipolar_aug = extend_data(x_train_bipolar, y_train_bipolar, 3)
+x_train_unipolar_aug = x_train_unipolar_aug[indices]
+y_train_unipolar_aug = y_train_unipolar_aug[indices]
