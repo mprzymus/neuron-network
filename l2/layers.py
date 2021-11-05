@@ -4,7 +4,7 @@ from l2.activation_function import Relu
 
 
 class GaussianWeightsInitStrategy:
-    def __init__(self, mean=0.0, standard_dev=1.0):
+    def __init__(self, mean=0.0, standard_dev=0.5):
         self.loc = mean
         self.scale = standard_dev
 
@@ -17,7 +17,8 @@ _gaussian = GaussianWeightsInitStrategy()
 
 class Layer:
     def __init__(self, input_size, layer_size, act_function=Relu, weights_init_strategy=_gaussian,
-                 bias=None):
+                 bias=None, previous_layer=None):
+        self.previous_layer = previous_layer
         self.weights = weights_init_strategy.init_weights(input_size, layer_size)
         self.act_function = act_function
         if bias is None:
@@ -25,6 +26,7 @@ class Layer:
         else:
             self.bias = bias
         self.last_result = None
+        self.last_input = None
 
     def output_size(self):
         layer_size, _ = self.weights.shape
@@ -32,9 +34,13 @@ class Layer:
 
     def activate(self, input_vector):
         self.calculate_act_input(input_vector)
+        return self.apply_activation()
+
+    def apply_activation(self):
         return np.vectorize(self.act_function.apply)(self.last_result)
 
     def calculate_act_input(self, input_vector):
+        self.last_input = input_vector
         weighted = self.weights.dot(input_vector)
         self.last_result = self.bias + weighted
 

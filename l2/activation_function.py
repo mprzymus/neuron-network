@@ -8,13 +8,16 @@ class Relu:
 
     @staticmethod
     def apply_derivative(relu_result):
-        return 0 if relu_result <= 0 else 1
+        return 0 if relu_result < 0 else 1
 
 
 class Sigmoid:
     @staticmethod
     def apply(x):
-        return 1 / (1 + math.exp(-x))
+        try:
+            return 1 / (1 + math.exp(-x))
+        except OverflowError:
+            return 1 if x > 0 else 0
 
     @staticmethod
     def apply_derivative(sigmoid_result):
