@@ -23,6 +23,7 @@ class Layer:
         self.act_function = act_function
         if bias is None:
             self.bias = weights_init_strategy.init_weights(1, 1)[0]
+            self.bias = np.positive(self.bias)
         else:
             self.bias = bias
         self.last_result = None

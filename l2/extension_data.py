@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def extend_data(x_train, y_train, augmented_size_factor, element_diff_factor=0.01):
+def extend_data(x_train, y_train, augmented_size_factor, element_diff_factor=0.1):
     array_x = []
     array_y = []
     for count, x in enumerate(x_train):

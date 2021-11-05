@@ -8,6 +8,8 @@ class Relu:
 
     @staticmethod
     def apply_derivative(relu_result):
+        if relu_result == 0:
+            return 0.5
         return 0 if relu_result < 0 else 1
 
 

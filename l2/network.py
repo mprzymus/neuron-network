@@ -4,6 +4,8 @@ from l2.activation_function import *
 from l2.extension_data import x_train_unipolar_aug, y_train_unipolar_aug
 from l2.layers import Layer, Softmax, GaussianWeightsInitStrategy
 
+EPOCHS = 10
+
 
 def print_if_verbose(verbose, to_print):
     if verbose:
@@ -43,7 +45,7 @@ class Network:
 
     def fit(self, xs, ys, verbose=False):
         epoch_size = np.size(xs)
-        for i in range(100):
+        for i in range(EPOCHS):
             epoch_error = 0
             loss_bias = [np.zeros(shape=layer_size) for layer_size in
                          map(lambda layer_in_network: np.size(layer_in_network.weights, axis=0), self.layers[::-1])]
@@ -76,16 +78,17 @@ class Network:
 if __name__ == '__main__':
     x_train = np.array([[1, 1], [2, 2]])
 
-    model = Network(input_size=2, learning_step=0.01)
+    model = Network(input_size=2, learning_step=0.06)
+
     model.add_layer(6, act_function=Relu)
-    model.add_layer(3, act_function=Relu)
+    model.add_layer(7, act_function=Tanh)
     model.compile(2)
 
     print("First prediction")
     print(f"{model.predict(x_train_unipolar_aug[0])}, {y_train_unipolar_aug[0]}")
-    print(f"{model.predict(x_train_unipolar_aug[1])}, {y_train_unipolar_aug[1]}")
+    print(f"{model.predict(x_train_unipolar_aug[-1])}, {y_train_unipolar_aug[-1]}")
     print("Learning steps:")
     model.fit(x_train_unipolar_aug, y_train_unipolar_aug, verbose=True)
     print("Prediction after learning")
     print(f"{model.predict(x_train_unipolar_aug[0])}, {y_train_unipolar_aug[0]}")
-    print(f"{model.predict(x_train_unipolar_aug[1])}, {y_train_unipolar_aug[1]}")
+    print(f"{model.predict(x_train_unipolar_aug[-1])}, {y_train_unipolar_aug[-1]}")
