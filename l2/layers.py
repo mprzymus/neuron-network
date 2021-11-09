@@ -63,5 +63,8 @@ class Softmax(Layer):
     class SoftmaxFun:
         @staticmethod
         def apply(input_vector):
-            result = np.exp(input_vector) / np.sum(np.exp(input_vector))
-            return result
+            e = np.exp(input_vector - np.max(input_vector))
+            if e.ndim == 1:
+                return e / np.sum(e, axis=0)
+            else:  # dim = 2
+                return e / np.sum(e, axis=1, keepdims=True)

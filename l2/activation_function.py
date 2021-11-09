@@ -1,5 +1,7 @@
 import math
 
+import numpy as np
+
 
 class Relu:
     @staticmethod
@@ -29,7 +31,7 @@ class Sigmoid:
 class Tanh:
     @staticmethod
     def apply(x):
-        return 2 / (1 + math.exp(-2 * x)) - 1
+        return np.tanh(x)
 
     @staticmethod
     def apply_derivative(tanh_result):
