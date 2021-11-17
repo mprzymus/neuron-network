@@ -18,14 +18,14 @@ class Relu:
 class Sigmoid:
     @staticmethod
     def apply(x):
-        try:
+        if x < 0:
+            return 1 - 1 / (1 + math.exp(x))
+        else:
             return 1 / (1 + math.exp(-x))
-        except OverflowError:
-            return 1 if x > 0 else 0
 
     @staticmethod
     def apply_derivative(sigmoid_result):
-        return sigmoid_result * (1 - sigmoid_result)
+        return sigmoid_result * (1.0 - sigmoid_result)
 
 
 class Tanh:

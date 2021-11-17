@@ -1,23 +1,19 @@
 import datetime
-import time
 
-import numpy as np
 from tensorflow import keras
 
 from l2.activation_function import *
 from l2.extension_data import x_train_unipolar_aug, y_train_unipolar_aug
 from l2.layers import Layer, Softmax, GaussianWeightsInitStrategy
 
-EPOCHS = 20
-
 
 def print_if_verbose(verbose, to_print):
     if verbose:
-        print(to_print)
+        print(f"{datetime.datetime.now()}: {to_print}")
 
 
 class Network:
-    def __init__(self, input_size, learning_step):
+    def __init__(self, input_size, learning_step=0.01):
         self.layers = []
         self.last_layer = None
         self.next_layer_input = input_size
@@ -45,10 +41,7 @@ class Network:
         return self.softmax.activate(xs)
 
     def loss_function(self, ys_label, ys_result):
-        if 0 in ys_result:
-            x = 'sad'
-        return -np.log(ys_result) * ys_label
-
+        return np.log(1e-15 + ys_result) * ys_label * -1.0
 
     def predict_all(self, xs):
         results = []
@@ -56,18 +49,20 @@ class Network:
             results.append(self.predict(x))
         return results
 
-    def fit(self, xs, ys, x_valid, y_valid, verbose=False, wanted_error=0.5, batch_size=None):
-        epoch_size = np.size(xs)
+    def fit(self, xs, ys, x_valid, y_valid, verbose=False, wanted_error=0.5, batch_size=None, max_epochs=7):
+        epoch_size = len(xs)
         batch_size = epoch_size if batch_size is None else batch_size
-        #  valid_error = self.count_loss_on_data(x_valid, y_valid)
         epochs_counter = 0
-        while '''valid_error > wanted_error''' and epochs_counter < EPOCHS:
+        valid_error = self.count_loss_on_data(x_valid, y_valid)
+        print_if_verbose(verbose, f"valid_loss {valid_error}")
+        while valid_error > wanted_error and epochs_counter < max_epochs:
             start_batch_from = 0
             epochs_counter += 1
             epoch_error = 0
             while start_batch_from < epoch_size:
-                epoch_error = self.perform_batch(epoch_error, xs[start_batch_from:start_batch_from + batch_size],
-                                                  ys[start_batch_from:start_batch_from + batch_size])
+                batch_x = xs[start_batch_from:start_batch_from + batch_size]
+                epoch_error = self.perform_batch(epoch_error, batch_x,
+                                                 ys[start_batch_from:start_batch_from + batch_size])
                 start_batch_from += batch_size
             valid_error = self.count_loss_on_data(x_valid, y_valid)
             print_if_verbose(verbose, f"learn_loss: {epoch_error / epoch_size}, valid_loss {valid_error}")
@@ -83,23 +78,24 @@ class Network:
             predict_loss = self.loss_function(y, y_predicted)
             next_layer_loss = predict_loss
             next_layer = self.softmax
-            softmax_loss_bias += predict_loss
-            softmax_loss += np.outer(self.softmax.last_input, predict_loss).T
+            predict_loss_der = -(y - y_predicted)
+            softmax_loss_bias += predict_loss_der
+            softmax_loss += np.outer(self.softmax.last_input, predict_loss_der).T
             epoch_error += predict_loss.sum()
-            for count, layer in enumerate(self.layers[::-1]):
-                derivative = layer.act_derivative()
+            for layer_number, layer in enumerate(self.layers[::-1]):
+                derivative = layer.last_act_derivative()
                 this_layer_loss = next_layer.weights.T.dot(next_layer_loss) * derivative
-                loss_bias[count] += this_layer_loss
-                loss[count] += np.outer(layer.last_input, this_layer_loss).T
+                loss_bias[layer_number] += this_layer_loss
+                loss[layer_number] += np.outer(layer.last_input, this_layer_loss).T  # tego jeszcze nie ma
                 next_layer_loss = this_layer_loss
                 next_layer = layer
         self.update_weights(batch_size, loss, loss_bias, softmax_loss, softmax_loss_bias)
         return epoch_error
 
     def update_weights(self, batch_size, loss, loss_bias, softmax_loss, softmax_loss_bias):
-        for count, layer in enumerate(self.layers[::-1]):
-            layer.weights -= self.learning_step / batch_size * loss[count]
-            layer.bias -= self.learning_step / batch_size * loss_bias[count].sum()
+        for layer_number, layer in enumerate(self.layers[::-1]):
+            layer.weights -= self.learning_step / batch_size * loss[layer_number]
+            layer.bias -= self.learning_step / batch_size * loss_bias[layer_number].sum()
         self.softmax.weights -= self.learning_step / batch_size * softmax_loss
         self.softmax.bias -= self.learning_step / batch_size * softmax_loss_bias.sum()
 
@@ -127,43 +123,3 @@ class Network:
         for y_predict, y_actual in zip(predictions, y_valid):
             error += np.sum(self.loss_function(y_actual, y_predict)) / valid_size
         return error
-
-
-if __name__ == '__main__':
-
-    (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
-    x_train = np.reshape(x_train, newshape=(len(x_train), 784))
-    x_test = np.reshape(x_test, newshape=(len(x_test), 784))
-    y_todo = np.zeros(shape=(len(y_test), 10))
-    for y, y_keras in zip(y_todo, y_test):
-        y[y_keras] = 1
-    y_test = y_todo
-    y_todo = np.zeros(shape=(len(y_train), 10))
-    for y, y_keras in zip(y_todo, y_train):
-        y[y_keras] = 1
-    y_train = y_todo
-    model = Network(input_size=784, learning_step=0.1)
-    model.add_layer(6, act_function=Relu)
-    model.add_layer(6, act_function=Tanh)
-    model.compile(10)
-
-    score = 0
-    for x, y in zip(x_test, y_test):
-        y_predict = model.predict(x)
-        if np.argmax(y_predict) == np.argmax(y):
-            score += 1
-    print(score / len(x_train_unipolar_aug[:400]))
-
-    #  print("First prediction")
-    #  print(f"{model.predict(x_train_unipolar_aug[0])}, {y_train_unipolar_aug[0]}")
-    #  print(f"{model.predict(x_train_unipolar_aug[-1])}, {y_train_unipolar_aug[-1]}")
-    print("Learning steps:")
-    model.fit(x_train[5900:], y_train[5900:], verbose=True, x_valid=x_train[:5900], y_valid=y_train[:5900], batch_size=100)
-    print("Prediction after learning")
-    score = 0
-    for x, y in zip(x_test, y_test):
-        y_predict = model.predict(x)
-        if np.argmax(y_predict) == np.argmax(y):
-            score += 1
-    print(score / len(x_train_unipolar_aug[:400]))
-

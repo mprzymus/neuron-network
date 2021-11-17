@@ -14,8 +14,8 @@ def extend_data(x_train, y_train, augmented_size_factor, element_diff_factor=0.1
     return np.array(array_x), np.array(array_y)
 
 
-x_train_unipolar = np.array([[1, 1], [1.1, 1], [1, 1.1], [1, 0], [0, 1], [0, 0]])
-y_train_unipolar = np.array([[1, 0], [1, 0], [1, 0], [0, 1], [0, 1], [0, 1]])
+x_train_unipolar = np.array([[1, 1], [1, 0], [0, 1], [0, 0]])
+y_train_unipolar = np.array([[1, 0], [0, 1], [0, 1], [1, 0]])
 x_train_unipolar_aug, y_train_unipolar_aug = extend_data(x_train_unipolar, y_train_unipolar, 100)
 
 indices = np.arange(x_train_unipolar_aug.shape[0])

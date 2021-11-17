@@ -66,6 +66,6 @@ class Softmax(Layer):
             subtract = input_vector - np.max(input_vector)
             e = np.exp(subtract)
             if e.ndim == 1:
-                return np.nan_to_num(e / np.sum(e, axis=0), copy=False, nan=0.0)
+                return e / np.sum(e, axis=0)
             else:  # dim = 2
-                return np.nan_to_num(e / np.sum(e, axis=1, keepdims=True), copy=False, nan=0.0)
+                return e / np.sum(e, axis=1, keepdims=True)
