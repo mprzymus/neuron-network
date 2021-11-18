@@ -34,6 +34,16 @@ class TestNetwork(TestCase):
         assert_array_equal(np.array([0.5, 0.5]), prediction)
         assert_array_equal(np.zeros(shape=2), self.model.softmax.last_input)
 
+    def test_should_gradient_clip(self):
+        self.model.gradient_clip = 2
+
+        gradient = np.array([-1000, 1, -1, 0, 10000])
+        expected = np.array([-2, 1, -1, 0, 2])
+
+        clipped = self.model.clip_gradient(gradient)
+
+        assert_array_equal(expected, clipped)
+
     def test_should_forward_prop(self):
         self.set_fixed_weights()
 

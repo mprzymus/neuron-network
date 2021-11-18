@@ -1,5 +1,6 @@
 import datetime
 
+import numpy as np
 from tensorflow import keras
 
 from l2.activation_function import *
@@ -13,12 +14,13 @@ def print_if_verbose(verbose, to_print):
 
 
 class Network:
-    def __init__(self, input_size, learning_step=0.01):
+    def __init__(self, input_size, learning_step=0.01, gradient_clip=10000):
         self.layers = []
         self.last_layer = None
         self.next_layer_input = input_size
         self.softmax = None
         self.learning_step = learning_step
+        self.gradient_clip = gradient_clip
 
     def add_layer(self, layer_size, act_function=Relu, weights_init_strategy=GaussianWeightsInitStrategy()):
         last_layer_out = self.output_size()
@@ -41,7 +43,7 @@ class Network:
         return self.softmax.activate(xs)
 
     def loss_function(self, ys_label, ys_result):
-        return np.log(1e-15 + ys_result) * ys_label * -1.0
+        return np.log(ys_result) * ys_label * -1.0
 
     def predict_all(self, xs):
         results = []
@@ -50,6 +52,8 @@ class Network:
         return results
 
     def fit(self, xs, ys, x_valid, y_valid, verbose=False, wanted_error=0.5, batch_size=None, max_epochs=7):
+        print(self.layers[0].weights)
+        print(self.softmax.weights)
         epoch_size = len(xs)
         batch_size = epoch_size if batch_size is None else batch_size
         epochs_counter = 0
@@ -66,38 +70,53 @@ class Network:
                 start_batch_from += batch_size
             valid_error = self.count_loss_on_data(x_valid, y_valid)
             print_if_verbose(verbose, f"learn_loss: {epoch_error / epoch_size}, valid_loss {valid_error}")
+            print(self.layers[0].weights)
+            print(self.softmax.weights)
 
     def perform_batch(self, epoch_error, xs, ys):
         batch_size = len(xs)
-        loss_bias = self.init_loss_bias()
-        loss = self.init_loss()
+        error_bias = self.init_loss_bias()
+        error = self.init_loss()
         softmax_loss_bias = self.init_softmax_loss_bias()
         softmax_loss = self.init_softmax_loss()
         for x, y in zip(xs, ys):
             y_predicted = self.predict(x)
             predict_loss = self.loss_function(y, y_predicted)
-            next_layer_loss = predict_loss
             next_layer = self.softmax
             predict_loss_der = -(y - y_predicted)
+            next_layer_error = predict_loss_der
             softmax_loss_bias += predict_loss_der
             softmax_loss += np.outer(self.softmax.last_input, predict_loss_der).T
             epoch_error += predict_loss.sum()
+            #  spróbować od nowa może
             for layer_number, layer in enumerate(self.layers[::-1]):
                 derivative = layer.last_act_derivative()
-                this_layer_loss = next_layer.weights.T.dot(next_layer_loss) * derivative
-                loss_bias[layer_number] += this_layer_loss
-                loss[layer_number] += np.outer(layer.last_input, this_layer_loss).T  # tego jeszcze nie ma
-                next_layer_loss = this_layer_loss
+                this_layer_error = next_layer.weights.T.dot(next_layer_error) * derivative
+                error_bias[layer_number] += this_layer_error
+                error[layer_number] += np.outer(layer.last_input, this_layer_error).T
+                next_layer_error = this_layer_error
                 next_layer = layer
-        self.update_weights(batch_size, loss, loss_bias, softmax_loss, softmax_loss_bias)
+        self.update_weights(batch_size, error, error_bias, softmax_loss, softmax_loss_bias)
         return epoch_error
 
     def update_weights(self, batch_size, loss, loss_bias, softmax_loss, softmax_loss_bias):
+        print("zmiany wag")
         for layer_number, layer in enumerate(self.layers[::-1]):
-            layer.weights -= self.learning_step / batch_size * loss[layer_number]
-            layer.bias -= self.learning_step / batch_size * loss_bias[layer_number].sum()
-        self.softmax.weights -= self.learning_step / batch_size * softmax_loss
-        self.softmax.bias -= self.learning_step / batch_size * softmax_loss_bias.sum()
+            weights = self.clip_gradient(self.learning_step / batch_size * loss[layer_number])
+            print(weights)
+            layer.weights -= weights
+            bias = self.clip_gradient(self.learning_step / batch_size * loss_bias[layer_number].sum())
+            print(bias)
+            layer.bias -= bias
+        last_layer_weights = self.clip_gradient(self.learning_step / batch_size * softmax_loss)
+        self.softmax.weights -= last_layer_weights
+        print(last_layer_weights)
+        last_layer_bias = self.clip_gradient(self.learning_step / batch_size * softmax_loss_bias.sum())
+        self.softmax.bias -= last_layer_bias
+        print(last_layer_bias)
+
+    def clip_gradient(self, gradient):
+        return np.where(np.abs(gradient) < self.gradient_clip, gradient, np.sign(gradient) * self.gradient_clip)
 
     def init_softmax_loss(self):
         return np.zeros(shape=self.softmax.weights.shape)
