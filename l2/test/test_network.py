@@ -1,13 +1,14 @@
 from unittest import TestCase
 
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_array_almost_equal
 
 from l2.activation_function import Relu
 from l2.network import Network
+from l2.test.test_layer import SequentialInitStrategy
 
 
-class TestNetwork(TestCase):
+class TestPrediction(TestCase):
     def setUp(self) -> None:
         self.model = Network(2)
         self.model.add_layer(3, Relu)
@@ -26,6 +27,7 @@ class TestNetwork(TestCase):
         for layer in self.model.layers:
             layer.bias = 0
         xs = np.array([0, 0])
+        self.model.softmax.bias = 0
 
         # when
         prediction = self.model.predict(xs)
@@ -47,7 +49,7 @@ class TestNetwork(TestCase):
     def test_should_forward_prop(self):
         self.set_fixed_weights()
 
-        self.model.predict(np.array([1, 2]))
+        prediction = self.model.predict(np.array([1, 2]))
 
         assert_array_equal(np.array([1, 2]), self.model.layers[0].last_input)
         assert_array_equal(np.array([0.5, 1.1, 1.7]), self.model.layers[0].last_result)
@@ -55,6 +57,7 @@ class TestNetwork(TestCase):
         assert_array_equal(np.array([12.3, 15.6]), self.model.layers[1].last_result)
         assert_array_equal(np.array([12.3, 15.6]), self.model.softmax.last_input)
         assert_array_equal(np.array([43.5, 40.2]), self.model.softmax.last_result)
+        assert_array_almost_equal(np.array([0.964429, 0.035571]), prediction)
 
     def set_fixed_weights(self):
         self.model.layers[0].weights = np.array([
@@ -73,3 +76,23 @@ class TestNetwork(TestCase):
         self.model.softmax.bias = 0
         self.model.layers[0].bias = 0
         self.model.layers[1].bias = 0
+
+
+class TestLearning(TestCase):
+    def setUp(self) -> None:
+        init_strategy = SequentialInitStrategy()
+        self.model = Network(2, learning_step=1)
+        self.model.add_layer(2, weights_init_strategy=init_strategy, bias=np.zeros(2))
+        self.model.compile(2, weights_init_strategy=init_strategy, bias=np.zeros(2))
+
+    def test_learn_one_pattern(self):
+        x = np.array([[1., 1.]])
+        y = np.array([[1., 0.]])
+        layer = self.model.softmax.previous_layer
+
+        self.model.perform_batch(0, x, y)
+
+        assert_array_almost_equal(self.model.softmax.bias, np.array([1, -1]), decimal=1)
+        assert_array_almost_equal(self.model.softmax.weights, np.array([[1, 6], [1, -2]]), decimal=1)
+        assert_array_almost_equal(layer.bias, np.array([-2, -2]), decimal=1)
+        assert_array_almost_equal(layer.weights, np.array([[-2, -1], [0, 1]]), decimal=1)

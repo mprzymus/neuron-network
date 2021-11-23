@@ -4,7 +4,7 @@ from l2.activation_function import Relu
 
 
 class GaussianWeightsInitStrategy:
-    def __init__(self, mean=0.0, standard_dev=0.5):
+    def __init__(self, mean=0.0, standard_dev=0.1):
         self.loc = mean
         self.scale = standard_dev
 
@@ -22,7 +22,7 @@ class Layer:
         self.weights = weights_init_strategy.init_weights(input_size, layer_size)
         self.act_function = act_function
         if bias is None:
-            self.bias = weights_init_strategy.init_weights(1, 1)[0]
+            self.bias = weights_init_strategy.init_weights(layer_size, 1)[0]
             self.bias = np.positive(self.bias)
         else:
             self.bias = bias
@@ -45,7 +45,7 @@ class Layer:
     def calculate_act_input(self, input_vector):
         self.last_input = input_vector
         weighted = self.weights.dot(input_vector)
-        self.last_result = self.bias + weighted
+        self.last_result = weighted# + self.bias
 
     def last_act_derivative(self):
         return np.vectorize(self.act_function.apply_derivative)(self.last_act)

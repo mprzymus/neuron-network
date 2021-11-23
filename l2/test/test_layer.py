@@ -15,7 +15,7 @@ INPUT_SIZE = 4
 class SequentialInitStrategy:
     @staticmethod
     def init_weights(input_size, layer_size):
-        return np.arange(input_size * layer_size).reshape((layer_size, input_size))
+        return np.arange(input_size * layer_size).reshape((layer_size, input_size)).astype('float64')
 
 
 class TestLayer(TestCase):
