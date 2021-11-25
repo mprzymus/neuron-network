@@ -3,3 +3,5 @@
 /.pytest_cache/
 /.idea/*
 /NIPS-polskie-znaki/
+*.pdf
+*.zip
