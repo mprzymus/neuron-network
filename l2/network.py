@@ -106,14 +106,17 @@ class Network:
 
     def update_weights(self, batch_size, loss, loss_bias, softmax_loss, softmax_loss_bias):
         for layer_number, layer in enumerate(self.layers[::-1]):
-            weights = self.clip_gradient(self.learning_step / batch_size * loss[layer_number])
+            weights = self.clip_gradient(self.gradient(batch_size, loss[layer_number]))
             layer.weights -= weights
-            bias = self.clip_gradient(self.learning_step / batch_size * loss_bias[layer_number])
+            bias = self.clip_gradient(self.gradient(batch_size, loss_bias[layer_number]))
             layer.bias -= bias
         last_layer_weights = self.clip_gradient(self.learning_step / batch_size * softmax_loss)
         self.softmax.weights -= last_layer_weights
         last_layer_bias = self.clip_gradient(self.learning_step / batch_size * softmax_loss_bias)
         self.softmax.bias -= last_layer_bias
+
+    def gradient(self, batch_size, loss):
+        return self.learning_step / batch_size * loss
 
     def clip_gradient(self, gradient):
         return np.where(np.abs(gradient) < self.gradient_clip, gradient, np.sign(gradient) * self.gradient_clip)
