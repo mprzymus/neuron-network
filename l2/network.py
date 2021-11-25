@@ -14,7 +14,7 @@ def print_if_verbose(verbose, to_print):
 
 
 class Network:
-    def __init__(self, input_size, learning_step=0.01, gradient_clip=10000, min_epochs=10):
+    def __init__(self, input_size, learning_step=0.01, gradient_clip=10000, min_epochs=4):
         self.layers = []
         self.last_layer = None
         self.next_layer_input = input_size
@@ -75,9 +75,9 @@ class Network:
             print_if_verbose(verbose, f"learn_loss: {train_error}, valid_loss {valid_error}")
             valid_errors.append(valid_error)
             train_errors.append(train_error)
-            if self.is_over_fitting(valid_errors):
+            if self.should_early_stop(valid_errors):
                 break
-        return train_errors, valid_errors
+        return train_errors, valid_errors, epochs_counter
 
     def perform_batch(self, epoch_error, xs, ys):
         batch_size = len(xs)
@@ -94,7 +94,6 @@ class Network:
             softmax_error_bias += predict_loss_der
             softmax_error += np.outer(predict_loss_der, self.softmax.last_input)
             epoch_error += predict_loss.sum()
-            #  spróbować od nowa może
             for layer_number, layer in enumerate(self.layers[::-1]):
                 derivative = layer.last_act_derivative()
                 this_layer_error = next_layer.weights.T.dot(next_layer_error) * derivative
@@ -106,21 +105,15 @@ class Network:
         return epoch_error
 
     def update_weights(self, batch_size, loss, loss_bias, softmax_loss, softmax_loss_bias):
-        # print("zmiany wag")
         for layer_number, layer in enumerate(self.layers[::-1]):
             weights = self.clip_gradient(self.learning_step / batch_size * loss[layer_number])
-            # print(weights)
             layer.weights -= weights
             bias = self.clip_gradient(self.learning_step / batch_size * loss_bias[layer_number])
-            # print(bias)
             layer.bias -= bias
         last_layer_weights = self.clip_gradient(self.learning_step / batch_size * softmax_loss)
         self.softmax.weights -= last_layer_weights
-        # print(last_layer_weights)
-
         last_layer_bias = self.clip_gradient(self.learning_step / batch_size * softmax_loss_bias)
         self.softmax.bias -= last_layer_bias
-        #  print(last_layer_bias)
 
     def clip_gradient(self, gradient):
         return np.where(np.abs(gradient) < self.gradient_clip, gradient, np.sign(gradient) * self.gradient_clip)
@@ -150,7 +143,7 @@ class Network:
             error += np.sum(self.loss_function(y_actual, y_predict)) / valid_size
         return error
 
-    def is_over_fitting(self, valid_errors):
+    def should_early_stop(self, valid_errors):
         if len(valid_errors) >= self.min_epochs:
             return valid_errors[-1] > valid_errors[-2] > valid_errors[-3]
         else:

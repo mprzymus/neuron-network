@@ -4,11 +4,11 @@ from tensorflow import keras
 from l2.activation_function import Sigmoid, Relu, Tanh
 from l2.network import Network
 
-train_size = 5900
+train_size = 5000
 
 
 def mnist_test():
-    x_train, y_train, x_valid,y_valid, x_test, y_test = prepare_data()
+    x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_data()
     model = Network(input_size=784, learning_step=0.01, gradient_clip=10)
     model.add_layer(100, act_function=Relu)
     model.add_layer(50, act_function=Relu)

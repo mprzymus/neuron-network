@@ -11,6 +11,21 @@ class GaussianWeightsInitStrategy:
     def init_weights(self, input_size, layer_size):
         return np.random.normal(size=(layer_size, input_size), loc=self.loc, scale=self.scale)
 
+    def __str__(self):
+        return f"Gaussian, mean={self.loc}, scale={self.scale}"
+
+
+class FixedWeightInitStrategy:
+    def __init__(self, value=0):
+        self.value = value
+
+    def init_weights(self, input_size, layer_size):
+        return np.zeros(shape=(layer_size, input_size)) + self.value
+
+
+    def __str__(self):
+        return f"Fixed, value={self.value}"
+
 
 _gaussian = GaussianWeightsInitStrategy()
 
