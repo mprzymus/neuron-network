@@ -110,9 +110,9 @@ class Network:
             layer.weights -= weights
             bias = self.clip_gradient(self.gradient(batch_size, loss_bias[layer_number]))
             layer.bias -= bias
-        last_layer_weights = self.clip_gradient(self.learning_step / batch_size * softmax_loss)
+        last_layer_weights = self.clip_gradient(self.gradient(batch_size, softmax_loss))
         self.softmax.weights -= last_layer_weights
-        last_layer_bias = self.clip_gradient(self.learning_step / batch_size * softmax_loss_bias)
+        last_layer_bias = self.clip_gradient(self.gradient(batch_size, softmax_loss_bias))
         self.softmax.bias -= last_layer_bias
 
     def gradient(self, batch_size, loss):
@@ -151,9 +151,3 @@ class Network:
             return valid_errors[-1] > valid_errors[-2] > valid_errors[-3]
         else:
             return False
-
-
-'''
-    zdecydowanie sposób zmiany wag
-    rosną zdecydowanie
-'''

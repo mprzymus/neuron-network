@@ -60,7 +60,7 @@ class Layer:
     def calculate_act_input(self, input_vector):
         self.last_input = input_vector
         weighted = self.weights.dot(input_vector)
-        self.last_result = weighted# + self.bias
+        self.last_result = weighted + self.bias
 
     def last_act_derivative(self):
         return np.vectorize(self.act_function.apply_derivative)(self.last_act)
@@ -82,5 +82,5 @@ class Softmax(Layer):
             e = np.exp(subtract)
             if e.ndim == 1:
                 return e / np.sum(e, axis=0)
-            else:  # dim = 2
+            else:
                 return e / np.sum(e, axis=1, keepdims=True)
