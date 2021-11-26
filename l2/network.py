@@ -6,6 +6,7 @@ from tensorflow import keras
 from l2.activation_function import *
 from l2.extension_data import x_train_unipolar_aug, y_train_unipolar_aug
 from l2.layers import Layer, Softmax, GaussianWeightsInitStrategy
+from l2.momentum import MomentumStrategy
 
 
 def print_if_verbose(verbose, to_print):
@@ -22,6 +23,7 @@ class Network:
         self.learning_step = learning_step
         self.gradient_clip = gradient_clip
         self.min_epochs = min_epochs
+        self.momentum = None  # to throw when used without compile
 
     def add_layer(self, layer_size, bias=None, act_function=Relu, weights_init_strategy=GaussianWeightsInitStrategy()):
         last_layer_out = self.output_size()
@@ -31,10 +33,13 @@ class Network:
         self.layers.append(layer)
         self.next_layer_input = layer_size
 
-    def compile(self, number_of_classes, bias=None, weights_init_strategy=GaussianWeightsInitStrategy()):
+    def compile(self, number_of_classes, bias=None, weights_init_strategy=GaussianWeightsInitStrategy(),
+                momentum=MomentumStrategy(), momentum_rate=0.7):
         self.softmax = Softmax(self.next_layer_input, number_of_classes, weights_init_strategy=weights_init_strategy,
                                bias=bias)
         self.softmax.previous_layer = self.layers[-1]
+        self.momentum = momentum
+        momentum.setup(momentum_rate, self)
 
     def output_size(self):
         return self.next_layer_input
@@ -106,13 +111,17 @@ class Network:
 
     def update_weights(self, batch_size, loss, loss_bias, softmax_loss, softmax_loss_bias):
         for layer_number, layer in enumerate(self.layers[::-1]):
-            weights = self.clip_gradient(self.gradient(batch_size, loss[layer_number]))
+            weights, bias = self.momentum.apply_momentum(batch_size, loss, loss_bias, self.gradient, layer_number)
+            weights = self.clip_gradient(weights)
+            bias = self.clip_gradient(bias)
             layer.weights -= weights
-            bias = self.clip_gradient(self.gradient(batch_size, loss_bias[layer_number]))
             layer.bias -= bias
-        last_layer_weights = self.clip_gradient(self.gradient(batch_size, softmax_loss))
+        last_layer_weights, last_layer_bias = self.momentum.apply_momentum_softmax(batch_size, softmax_loss,
+                                                                                   softmax_loss_bias, self.gradient)
+
+        last_layer_weights = self.clip_gradient(last_layer_weights)
+        last_layer_bias = self.clip_gradient(last_layer_bias)
         self.softmax.weights -= last_layer_weights
-        last_layer_bias = self.clip_gradient(self.gradient(batch_size, softmax_loss_bias))
         self.softmax.bias -= last_layer_bias
 
     def gradient(self, batch_size, loss):
