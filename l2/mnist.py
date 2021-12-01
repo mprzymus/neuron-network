@@ -2,18 +2,19 @@ import numpy as np
 from tensorflow import keras
 
 from l2.activation_function import Sigmoid, Relu, Tanh
+from l2.alfa_opt import Adagrad, NoOptimizer
 from l2.momentum import Momentum, Nag, MomentumStrategy
 from l2.network import Network
 
-train_size = 5000
+train_size = 50000
 
 
 def mnist_test():
     x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_data()
-    model = Network(input_size=784, learning_step=0.05, gradient_clip=10)
+    model = Network(input_size=784, learning_step=0.01, gradient_clip=1, optimizer=Adagrad())
     model.add_layer(10, act_function=Relu)
     model.add_layer(5, act_function=Relu)
-    model.compile(10, momentum=Nag(), momentum_rate=0.5)
+    model.compile(10, momentum_rate=0.8)
     score = 0
     for x, y in zip(x_test, y_test):
         y_predict = model.predict(x)
@@ -26,7 +27,7 @@ def mnist_test():
     #  print(f"{model.predict(x_train_unipolar_aug[-1])}, {y_train_unipolar_aug[-1]}")
     print("Learning steps:")
     model.fit(x_train, y_train, verbose=True, x_valid=x_valid,
-              y_valid=y_valid, batch_size=100, max_epochs=6, target_loss=0.15)
+              y_valid=y_valid, batch_size=10, max_epochs=6, target_loss=0.15)
     print("Prediction after learning")
 
     score = 0
