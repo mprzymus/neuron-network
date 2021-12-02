@@ -90,3 +90,40 @@ class Adadelta(NoOptimizer):
             gradient, self.previous_grad_biases[layer_number], self.delta_bias_rms[layer_number]
         )
         return result
+
+
+class Adam(NoOptimizer):
+    def __init__(self, gradient_factor=0.9, square_gradient_factor=0.999):
+        self.gradient_factor = gradient_factor
+        self.square_gradient_factor = square_gradient_factor
+        self.previous_gradient_weight = []
+        self.previous_gradient_bias = []
+        self.previous_gradient_squared_weight = []
+        self.previous_gradient_squared_bias = []
+        self.number_of_iterations = 1
+
+    def init_optimizer(self, model):
+        for layer in model.layers[::-1]:
+            self.previous_gradient_squared_weight.append(np.zeros(np.shape(layer.weights)))
+            self.previous_gradient_weight.append(np.zeros(np.shape(layer.weights)))
+            self.previous_gradient_bias.append(np.zeros(np.shape(layer.bias)))
+            self.previous_gradient_squared_bias.append(np.zeros(np.shape(layer.bias)))
+        self.previous_gradient_squared_weight.append(np.zeros(np.shape(model.softmax.weights)))
+        self.previous_gradient_weight.append(np.zeros(np.shape(model.softmax.weights)))
+        self.previous_gradient_bias.append(np.zeros(np.shape(model.softmax.bias)))
+        self.previous_gradient_squared_bias.append(np.zeros(np.shape(model.softmax.bias)))
+
+    def apply_optimizer(self, gradient, alfa, layer_number):
+        self.previous_gradient_weight[layer_number] = self.gradient_factor * self.previous_gradient_weight[
+            layer_number] + (1 - self.gradient_factor) * gradient
+        self.previous_gradient_squared_weight[
+            layer_number] = self.square_gradient_factor * self.previous_gradient_squared_weight[layer_number] + (
+                1 - self.square_gradient_factor) * (gradient ** 2)
+        corrected_gradient = self.previous_gradient_weight[layer_number] / (
+                1 - np.power(self.gradient_factor, self.number_of_iterations))
+        corrected_gradient_square = self.previous_gradient_squared_weight[layer_number] / (
+                1 - np.power(self.square_gradient_factor, self.number_of_iterations))
+        return alfa * corrected_gradient / (np.sqrt(corrected_gradient_square) + EPS)
+
+    def apply_optimizer_bias(self, gradient, alfa, layer_number):
+        return super().apply_optimizer_bias(gradient, alfa, layer_number)

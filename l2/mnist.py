@@ -2,7 +2,7 @@ import numpy as np
 from tensorflow import keras
 
 from l2.activation_function import Sigmoid, Relu, Tanh
-from l2.alfa_opt import Adagrad, NoOptimizer, Adadelta
+from l2.alfa_opt import Adagrad, NoOptimizer, Adadelta, Adam
 from l2.momentum import Momentum, Nag, MomentumStrategy
 from l2.network import Network
 
@@ -11,7 +11,7 @@ train_size = 50000
 
 def mnist_test():
     x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_data()
-    model = Network(input_size=784, learning_step=0.01, gradient_clip=1, optimizer=Adadelta())
+    model = Network(input_size=784, learning_step=0.01, gradient_clip=1, optimizer=Adam())
     model.add_layer(15, act_function=Sigmoid)
     model.compile(10, momentum_rate=0.8)
     score = 0

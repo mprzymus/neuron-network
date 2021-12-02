@@ -120,6 +120,8 @@ class Network:
     def update_weights(self, batch_size, loss, loss_bias, softmax_loss, softmax_loss_bias):
         batch_step = self.learning_step / batch_size
         for layer_number, layer in enumerate(self.layers[::-1]):
+            # todo use one interface for all optimizers, data and needed data pack with one objects,
+            #  present one is really ugly
             if self.momentum.is_momentum():
                 weights_change, bias_change = self.momentum.apply_momentum(
                     batch_size, loss, loss_bias, self.gradient, layer_number
