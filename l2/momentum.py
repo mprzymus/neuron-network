@@ -14,6 +14,10 @@ class MomentumStrategy:
     def modify_gradient_input_softmax(self, to_modify, to_modify_weights):
         return to_modify_weights, to_modify
 
+    @staticmethod
+    def is_momentum():
+        return False
+
 
 class Momentum(MomentumStrategy):
     def __init__(self):
@@ -47,6 +51,10 @@ class Momentum(MomentumStrategy):
         self.prev_softmax_update = delta_weights
         self.prev_softmax_bias_update = delta_bias
         return delta_weights, delta_bias
+
+    @staticmethod
+    def is_momentum():
+        return True
 
 
 class Nag(MomentumStrategy):
@@ -91,3 +99,7 @@ class Nag(MomentumStrategy):
     def modify_gradient_input_softmax(self, to_modify_bias, to_modify_weights):
         return self.momentum_rate * (to_modify_weights - self.prev_softmax_update), \
                self.momentum_rate * (to_modify_bias - self.prev_softmax_bias_update)
+
+    @staticmethod
+    def is_momentum():
+        return True

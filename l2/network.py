@@ -120,22 +120,32 @@ class Network:
     def update_weights(self, batch_size, loss, loss_bias, softmax_loss, softmax_loss_bias):
         batch_step = self.learning_step / batch_size
         for layer_number, layer in enumerate(self.layers[::-1]):
-            weights_change, bias_change = self.momentum.apply_momentum(
-                batch_size, loss, loss_bias, self.gradient, layer_number
-            )
-            weights_change /= batch_step
-            bias_change /= batch_step
-            weights_change = self.optimizer.apply_optimizer(weights_change, layer_number) * batch_step
-            bias_change = self.optimizer.apply_optimizer_bias(bias_change, layer_number) * batch_step
+            if self.momentum.is_momentum():
+                weights_change, bias_change = self.momentum.apply_momentum(
+                    batch_size, loss, loss_bias, self.gradient, layer_number
+                )
+            else:
+                weights_change = self.gradient(batch_size, loss[layer_number])
+                bias_change = self.gradient(batch_size, loss_bias[layer_number])
+                weights_change = self.optimizer.apply_optimizer(
+                    weights_change, self.learning_step, layer_number) / batch_size
+                bias_change = self.optimizer.apply_optimizer_bias(
+                    bias_change, self.learning_step, layer_number) / batch_size
             weights_change = self.clip_gradient(weights_change)
             bias_change = self.clip_gradient(bias_change)
             layer.weights -= weights_change
             layer.bias -= bias_change
-        last_layer_weights, last_layer_bias = self.momentum.apply_momentum_softmax(
-            batch_size, softmax_loss, softmax_loss_bias, self.gradient
-        )
-        last_layer_weights = self.optimizer.apply_optimizer(last_layer_weights / batch_step, -1) * batch_step
-        last_layer_bias = self.optimizer.apply_optimizer_bias(last_layer_bias / batch_step, -1) * batch_step
+        if self.momentum.is_momentum():
+            last_layer_weights, last_layer_bias = self.momentum.apply_momentum_softmax(
+                batch_size, softmax_loss, softmax_loss_bias, self.gradient
+            )
+        else:
+            last_layer_weights = self.gradient(batch_size, softmax_loss)
+            last_layer_bias = self.gradient(batch_size, softmax_loss_bias)
+            last_layer_weights = self.optimizer.apply_optimizer(
+                last_layer_weights / batch_step, self.learning_step, -1) / batch_size
+            last_layer_bias = self.optimizer.apply_optimizer_bias(
+                last_layer_bias / batch_step, self.learning_step, -1) / batch_size
         last_layer_weights = self.clip_gradient(last_layer_weights)
         last_layer_bias = self.clip_gradient(last_layer_bias)
         self.softmax.weights -= last_layer_weights
