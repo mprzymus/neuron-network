@@ -4,7 +4,7 @@ import numpy as np
 
 from l2.activation_function import Relu
 from l2.weight_init_factory import GaussianWeightsInitStrategy, FixedWeightInitStrategy
-from l2.mnist import prepare_data
+from mnist_prep import prepare_mnist_1d
 from l2.network import Network
 from l2.score import count_stats
 
@@ -18,7 +18,7 @@ _fixed10 = FixedWeightInitStrategy(10)
 _fixed10_negative = FixedWeightInitStrategy(-10)
 weight_init_strategies = [_fixed0]
 if __name__ == '__main__':
-    x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_data()
+    x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_mnist_1d()
     for weight_init in weight_init_strategies:
         print(f"Weight init str: {weight_init}")
         matrix = np.zeros(shape=(10, 10))
