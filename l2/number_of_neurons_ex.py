@@ -3,14 +3,14 @@ from statistics import mean, stdev
 import numpy as np
 
 from l2.activation_function import Relu
-from l2.mnist import prepare_data
+from mnist_prep import prepare_mnist_1d
 from l2.network import Network
 from l2.score import count_stats
 
 MAX_EPOCHS = 50
 
 if __name__ == '__main__':
-    x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_data()
+    x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_mnist_1d()
     for layer_size in range(1, 2, 10):
         print(f"Layer size: {layer_size}")
         matrix = np.zeros(shape=(10, 10))

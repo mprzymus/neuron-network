@@ -1,17 +1,16 @@
 import numpy as np
-from tensorflow import keras
 
-from l2.activation_function import Sigmoid, Relu, Tanh
-from l2.alfa_opt import Adagrad, NoOptimizer, Adadelta, Adam
-from l2.momentum import Momentum, Nag, MomentumStrategy
+from l2.activation_function import Sigmoid
+from l2.alfa_opt import Adam
 from l2.network import Network
-from l2.weight_init_factory import XavierWeightInitStrategy, WeightInitStrategy, HeWeightInitStrategy
+from l2.weight_init_factory import XavierWeightInitStrategy
+from mnist_prep import prepare_mnist_1d
 
 train_size = 50000
 
 
 def mnist_test():
-    x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_data()
+    x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_mnist_1d(train_size)
     model = Network(input_size=784, learning_step=0.01, gradient_clip=1, optimizer=Adam())
     model.add_layer(13, act_function=Sigmoid, weights_init_strategy=XavierWeightInitStrategy())
     model.add_layer(12, act_function=Sigmoid, weights_init_strategy=XavierWeightInitStrategy())
@@ -38,25 +37,6 @@ def mnist_test():
         if np.argmax(y_predict) == np.argmax(y):
             score += 1
     print(f"score percentage: {score / len(x_test)}")
-
-
-def prepare_data():
-    (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
-    x_train = np.reshape(x_train, newshape=(len(x_train), 784))
-    x_test = np.reshape(x_test, newshape=(len(x_test), 784))
-    y_todo = np.zeros(shape=(len(y_test), 10))
-    x_train = x_train.astype('float64')
-    x_test = x_test.astype('float64')
-    for y, y_keras in zip(y_todo, y_test):
-        y[y_keras] = 1
-    y_test = y_todo
-    y_todo = np.zeros(shape=(len(y_train), 10))
-    for y, y_keras in zip(y_todo, y_train):
-        y[y_keras] = 1
-    y_train = y_todo
-    x_train = x_train / 255.0
-    x_test = x_test / 255.0
-    return x_train[:train_size], y_train[:train_size], x_train[train_size:], y_train[train_size:], x_test, y_test
 
 
 if __name__ == '__main__':
