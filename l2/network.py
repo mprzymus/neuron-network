@@ -6,7 +6,8 @@ from tensorflow import keras
 from l2.activation_function import *
 from l2.alfa_opt import NoOptimizer
 from l2.extension_data import x_train_unipolar_aug, y_train_unipolar_aug
-from l2.layers import Layer, Softmax, GaussianWeightsInitStrategy
+from l2.layers import Layer, Softmax
+from l2.weight_init_factory import GaussianWeightsInitStrategy
 from l2.momentum import MomentumStrategy
 
 
@@ -79,8 +80,8 @@ class Network:
                 epoch_error = self.perform_batch(epoch_error, batch_x,
                                                  ys[start_batch_from:start_batch_from + batch_size])
                 start_batch_from += batch_size
-            valid_error = self.count_loss_on_data(x_valid, y_valid)
             train_error = self.count_loss_on_data(xs, ys)
+            valid_error = self.count_loss_on_data(x_valid, y_valid)
             print_if_verbose(verbose, f"learn_loss: {train_error}, valid_loss {valid_error}")
             valid_errors.append(valid_error)
             train_errors.append(train_error)

@@ -3,7 +3,7 @@ from statistics import mean, stdev
 import numpy as np
 
 from l2.activation_function import Relu
-from l2.layers import GaussianWeightsInitStrategy, FixedWeightInitStrategy
+from l2.weight_init_factory import GaussianWeightsInitStrategy, FixedWeightInitStrategy
 from l2.mnist import prepare_data
 from l2.network import Network
 from l2.score import count_stats
@@ -16,18 +16,18 @@ _gaussian3 = GaussianWeightsInitStrategy(mean=0.0, standard_dev=10)
 _fixed0 = FixedWeightInitStrategy(0)
 _fixed10 = FixedWeightInitStrategy(10)
 _fixed10_negative = FixedWeightInitStrategy(-10)
-weight_init_strategies = [_gaussian1, _gaussian2, _gaussian3, _fixed0, _fixed10, _fixed10_negative]
+weight_init_strategies = [_fixed0]
 if __name__ == '__main__':
     x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_data()
     for weight_init in weight_init_strategies:
         print(f"Weight init str: {weight_init}")
         matrix = np.zeros(shape=(10, 10))
         score = []
-        for i in range(10):
+        for i in range(1):
             print(f"Attempt {i}")
             model = Network(input_size=784, learning_step=0.005, gradient_clip=1)
-            model.add_layer(12, act_function=Relu)
-            model.compile(10)
+            model.add_layer(12, act_function=Relu, weights_init_strategy=weight_init)
+            model.compile(10, weights_init_strategy=weight_init)
             verbose = i == 0
             train_errors, valid_errors, epochs = model.fit(x_train, y_train, verbose=verbose, x_valid=x_valid,
                                                            y_valid=y_valid, batch_size=100,

@@ -1,37 +1,13 @@
 import numpy as np
 
 from l2.activation_function import Relu
-
-
-class GaussianWeightsInitStrategy:
-    def __init__(self, mean=0.0, standard_dev=0.1):
-        self.loc = mean
-        self.scale = standard_dev
-
-    def init_weights(self, input_size, layer_size):
-        return np.random.normal(size=(layer_size, input_size), loc=self.loc, scale=self.scale)
-
-    def __str__(self):
-        return f"Gaussian, mean={self.loc}, scale={self.scale}"
-
-
-class FixedWeightInitStrategy:
-    def __init__(self, value=0):
-        self.value = value
-
-    def init_weights(self, input_size, layer_size):
-        return np.zeros(shape=(layer_size, input_size)) + self.value
-
-
-    def __str__(self):
-        return f"Fixed, value={self.value}"
-
+from l2.weight_init_factory import GaussianWeightsInitStrategy, WeightInitStrategy
 
 _gaussian = GaussianWeightsInitStrategy()
 
 
 class Layer:
-    def __init__(self, input_size, layer_size, act_function=Relu, weights_init_strategy=_gaussian,
+    def __init__(self, input_size, layer_size, act_function=Relu, weights_init_strategy: WeightInitStrategy = _gaussian,
                  bias=None, previous_layer=None):
         self.previous_layer = previous_layer
         self.weights = weights_init_strategy.init_weights(input_size, layer_size)
