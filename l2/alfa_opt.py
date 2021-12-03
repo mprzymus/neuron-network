@@ -2,7 +2,7 @@ from math import sqrt
 
 import numpy as np
 
-EPS = 1e-2
+EPS = 1e-8
 
 
 class OptimizerStrategy:
