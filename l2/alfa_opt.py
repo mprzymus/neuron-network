@@ -5,7 +5,7 @@ import numpy as np
 EPS = 1e-2
 
 
-class NoOptimizer:
+class OptimizerStrategy:
     def init_optimizer(self, model):
         pass
 
@@ -16,7 +16,7 @@ class NoOptimizer:
         return gradient
 
 
-class Adagrad(NoOptimizer):
+class Adagrad(OptimizerStrategy):
     def __init__(self):
         self.previous_grad_weights = []
         self.previous_grad_biases = []
@@ -51,7 +51,7 @@ class Adagrad(NoOptimizer):
         return np.sqrt(self.previous_grad_biases[layer_number] + EPS)
 
 
-class Adadelta(NoOptimizer):
+class Adadelta(OptimizerStrategy):
     def __init__(self, gamma=0.9):
         self.gamma = gamma
         self.delta_weight_rms = []
@@ -92,7 +92,7 @@ class Adadelta(NoOptimizer):
         return result
 
 
-class Adam(NoOptimizer):
+class Adam(OptimizerStrategy):
     def __init__(self, gradient_factor=0.9, square_gradient_factor=0.999):
         self.gradient_factor = gradient_factor
         self.square_gradient_factor = square_gradient_factor

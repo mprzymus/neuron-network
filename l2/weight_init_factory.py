@@ -16,13 +16,13 @@ class XavierWeightInitStrategy(WeightInitStrategy):
 
     def init_weights(self, input_size, output_size):
         variance = 2 / input_size + output_size
-        return np.random.normal(loc=0, scale=0.1, size=(output_size, input_size)) * sqrt(variance)
+        return np.random.normal(loc=0, scale=sqrt(variance), size=(output_size, input_size))
 
 
 class HeWeightInitStrategy(WeightInitStrategy):
     def init_weights(self, input_size, output_size):
         variance = 2 / input_size
-        return np.random.normal(loc=0, scale=0.1, size=(output_size, input_size)) * sqrt(variance)
+        return np.random.normal(loc=0, scale=sqrt(variance), size=(output_size, input_size))
 
 
 class GaussianWeightsInitStrategy(WeightInitStrategy):

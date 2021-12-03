@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow import keras
 
 from l2.activation_function import *
-from l2.alfa_opt import NoOptimizer
+from l2.alfa_opt import OptimizerStrategy
 from l2.extension_data import x_train_unipolar_aug, y_train_unipolar_aug
 from l2.layers import Layer, Softmax
 from l2.weight_init_factory import GaussianWeightsInitStrategy
@@ -17,7 +17,7 @@ def print_if_verbose(verbose, to_print):
 
 
 class Network:
-    def __init__(self, input_size, learning_step=0.01, gradient_clip=10000, min_epochs=4, optimizer=NoOptimizer()):
+    def __init__(self, input_size, learning_step=0.01, gradient_clip=10000, min_epochs=4, optimizer=OptimizerStrategy()):
         self.optimizer = optimizer
         self.layers = []
         self.last_layer = None
