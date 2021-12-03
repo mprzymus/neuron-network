@@ -12,7 +12,7 @@ from mnist_prep import prepare_mnist_1d
 MAX_EPOCHS = 10
 
 if __name__ == '__main__':
-    x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_mnist_1d(5000)
+    x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_mnist_1d(50000)
     for act_fun in [Sigmoid, Relu]:
         print(f"Act: {act_fun}")
         matrix = np.zeros(shape=(10, 10))
@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
             ex_score, ex_matrix = count_stats(model, x_test, y_test)
             if epochs != MAX_EPOCHS:
-                print(f"Early stop: {epochs}")
+                print(f"Early st0op: {epochs}")
             score.append(ex_score)
             matrix += ex_matrix
         matrix /= 10

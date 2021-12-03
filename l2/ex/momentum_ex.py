@@ -11,7 +11,7 @@ from l2.score import count_stats
 MAX_EPOCHS = 10
 
 if __name__ == '__main__':
-    x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_mnist_1d(5000)
+    x_train, y_train, x_valid, y_valid, x_test, y_test = prepare_mnist_1d(50000)
     for act_fun in [Sigmoid, Relu]:
         print(f"Act: {act_fun}")
         matrix = np.zeros(shape=(10, 10))
