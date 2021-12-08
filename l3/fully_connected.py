@@ -5,7 +5,7 @@ from keras.layers import Dense
 
 from mnist_prep import prepare_mnist_1d
 
-train_size = 50000
+train_size = 5000
 
 
 def use_network():
